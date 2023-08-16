@@ -1,18 +1,14 @@
-import { PlanRepository } from "./plan.repository";
+import { IPlanRepository } from "./plan.repository";
 import { HttpError, ForbiddenError, NotFoundError } from "../../utility/http-error";
 import { CreatePlanDto } from "./dto/create-plan-dto";
 import { User } from "../user/models/user";
 import { CreateProgramDto } from "./program/dto/create-program.dto";
-import { Program } from "./program/models/program";
 import { Plan
  } from "./models/plan";
 
 
 export class PlanService { 
-    private planRepo: PlanRepository
-    constructor() {
-        this.planRepo = new PlanRepository
-    }
+    constructor(private planRepo: IPlanRepository) {}
 
     getPlanById(planId: number) {
         const plan = this.planRepo.findById(planId)

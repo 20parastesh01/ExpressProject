@@ -1,15 +1,16 @@
+import { Express } from "express"
 import request from "supertest"
-import { app } from "../src/api"
 import { loginAdminTest, loginRepTest } from "./utility"
 import { AppDataSource } from "../src/data-source"
-import { seedUser } from "../src/seed"
+import { makeApp } from "../src/api"
 
 
 describe("Program", () => {
-
+    let app: Express
     beforeAll(async() =>  {
         await AppDataSource.initialize()
-        await seedUser()
+        const dataSource = await AppDataSource.initialize()
+        app = makeApp(dataSource)
     })
 
     afterAll(async() => {
@@ -20,7 +21,7 @@ describe("Program", () => {
 
         it("should fail if we did not login", async () => {
 
-            const adminUser = await loginAdminTest();
+            const adminUser = await loginAdminTest(app);
 
             const today = new Date()
             const tomorrow = new Date(today.setDate(today.getDate() + 1))
@@ -37,8 +38,8 @@ describe("Program", () => {
         })
 
         it("should create a program", async () => {
-            const adminUser = await loginAdminTest();
-            const repUser = await loginRepTest();
+            const adminUser = await loginAdminTest(app);
+            const repUser = await loginRepTest(app);
             
             const today = new Date()
             const tomorrow = new Date(today.setDate(today.getDate() + 1))
@@ -61,7 +62,7 @@ describe("Program", () => {
         })
 
         it.skip("should fail if the deadline is exceeded", async () => {
-            const user = await loginAdminTest();
+            const user = await loginAdminTest(app);
 
             const today = new Date()
             const yesterday = new Date(today.setDate(today.getDate() - 1))

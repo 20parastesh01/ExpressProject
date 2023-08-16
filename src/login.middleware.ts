@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from "express"
-import { userService } from "./dependency"
+import { UserService } from "./modules/user/user.service"
 
 
-export const loginMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+export const loginMiddleware = (userService: UserService) => async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.headers["authorization"]
     if (!userId) {
         res.status(401).send({message: "Unauthorized"})

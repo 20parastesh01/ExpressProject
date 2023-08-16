@@ -1,14 +1,17 @@
+import { Express } from "express"
 import request from "supertest"
-import { app } from "../src/api"
 import { loginAdminTest, loginRepTest } from "./utility"
 import { AppDataSource } from "../src/data-source"
-import { seedUser } from "../src/seed"
+import { makeApp } from "../src/api"
+
 
 describe("Plan", () => {
 
+    let app: Express
+
     beforeAll(async () =>  {
-        await AppDataSource.initialize()
-        await seedUser()
+        const dataSource = await AppDataSource.initialize()
+        app = makeApp(dataSource)
     })
 
     afterAll(async () => {
@@ -24,7 +27,7 @@ describe("Plan", () => {
         })
 
         it.skip("should fail if user is not admin", async () => {
-            const user = await loginRepTest()
+            const user = await loginRepTest(app)
             const today = new Date()
             const tomorrow = new Date(today.setDate(today.getDate() + 1))
             const { body: plan } = await request(app)
@@ -38,7 +41,7 @@ describe("Plan", () => {
         })
 
         it("should create a plan if we are logged in", async () => {
-            const user = await loginAdminTest()
+            const user = await loginAdminTest(app)
             const today = new Date()
             const tomorrow = new Date(today.setDate(today.getDate() + 1))
             const { body: plan } = await request(app)
@@ -51,7 +54,7 @@ describe("Plan", () => {
             expect(plan.title).toBe("Tehran shomal highway")
             })
         it("should send bad request if title is not provided", async() => {
-            const user = await loginAdminTest()
+            const user = await loginAdminTest(app)
             
             const { body: plan } = await request(app)
                 .post("/plan")
@@ -63,7 +66,7 @@ describe("Plan", () => {
 
     describe("Read", () => {
         it.skip("should read the plan", async () => {
-            const user = await loginAdminTest()
+            const user = await loginAdminTest(app)
             const title = "Tehran shomal highway"
             const today = new Date()
             const tomorrow = new Date(today.setDate(today.getDate() + 1))

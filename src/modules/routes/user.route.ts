@@ -1,14 +1,19 @@
 import {Router} from "express"
 import { loginDto } from "../user/dto/login.dto";
 import { handleExpress } from "../../utility/handle-express";
-import { userService } from "../../dependency";
+import { UserService } from "../user/user.service";
 
-export const app = Router()
 
-app.post("/login", (req, res) => {
+export const makeUserRouter = (userService: UserService) => {
 
-        const dto = loginDto.parse(req.body)
+        const app = Router()
 
-        handleExpress(res, () => userService.login(dto))
-})
+        app.post("/login", (req, res) => {
 
+                const dto = loginDto.parse(req.body)
+
+                handleExpress(res, () => userService.login(dto))
+        })
+
+        return app;
+}
